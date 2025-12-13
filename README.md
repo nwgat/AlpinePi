@@ -26,6 +26,11 @@ Python
 * **ALPINE_BRANCH = "v3.23"** # Alpine version
 * **IMAGE_SIZE_MB = 512**     # Initial image size (in MB)
 
+**Flash the Image**
+
+Once the build finishes, you will see a file named similar to: alpine-rpi-armhf-v3.23-20251214-123000.img.gz
+Flash this file to your SD card using Raspberry Pi Imager
+
 ## 📋 Prerequisites
 
 1.  **Docker:** Ensure Docker is installed and running.
