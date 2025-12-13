@@ -17,6 +17,15 @@ This builder creates a minimal (512MB) image with essential drivers, Wi-Fi suppo
 * **🐳 Dockerized Build:** Runs entirely inside a container—no mess on your host machine. Works on Windows, macOS, and Linux.
 * **🔧 Customizable:** Injects your own `config.txt`, `cmdline.txt`, and setup scripts.
 
+🧩 Customization
+
+To change the image properties, edit the variables at the top of build.py:
+Python
+
+* **ARCH = "armhf"** # Architecture (armhf, aarch64, etc.)
+* **ALPINE_BRANCH = "v3.23"** # Alpine version
+* **IMAGE_SIZE_MB = 512**     # Initial image size (in MB)
+
 ## 📋 Prerequisites
 
 1.  **Docker:** Ensure Docker is installed and running.
