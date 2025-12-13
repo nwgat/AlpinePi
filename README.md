@@ -9,6 +9,7 @@ This builder creates a minimal (512MB) image with essential drivers, Wi-Fi suppo
 * **⚡ Lightweight:** Base image size is set to **512MB** (expandable).
 * **📶 Wi-Fi Ready:** Includes critical firmware (`brcmfmac`, `cypress`) and tools (`iwd`, `iw`, `wpa_supplicant`).
 * **🛠️ Pre-Configured Services:**
+    * **IWD WiFi** Use setup-interfaces-iwd to switch to a modern and easy to use wpa_supplicant replacement 
     * **Dropbear SSH:** Enabled by default with root login allowed.
     * **Auto-Resize:** Automatically expands the root partition to fill your SD card on the first boot.
     * **IP Display:** Clearly prints the Wi-Fi IP address to the console on boot.
@@ -19,8 +20,9 @@ This builder creates a minimal (512MB) image with essential drivers, Wi-Fi suppo
 ## 📋 Prerequisites
 
 1.  **Docker:** Ensure Docker is installed and running.
-    * [Get Docker Desktop](https://www.docker.com/products/docker-desktop/) (Windows/Mac)
     * `sudo apt install docker.io` (Linux)
+    * [Get Docker Desktop](https://www.docker.com/products/docker-desktop/) (Windows/Mac)
+
 2.  **Python 3:** Required to run the build wrapper script.
 
 ## 📂 Project Structure
