@@ -1,0 +1,6 @@
+kernel=vmlinuz-rpi
+initramfs initramfs-rpi
+include usercfg.txt
+dtoverlay=vc4-fkms-v3d
+dtoverlay=miniuart-max-clock=3000000
+disable_overscan=1
