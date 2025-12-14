@@ -12,8 +12,6 @@ ROOTFS = "/tmp/alpine-build"
 BOOTFS = "/tmp/alpine-boot"
 
 # --- INTERNAL BUILD SCRIPT (Runs inside the Docker container) ----------------
-# NOTE: In this f-string, double curly braces {{ }} are used for literal shell characters.
-# Single curly braces { } are used to inject Python variables (like ARCH).
 INTERNAL_SCRIPT = f"""
 set -e
 
@@ -163,41 +161,59 @@ IP_SERVICE
     chmod +x "$ROOTFS/etc/init.d/show-ip"
     ln -s /etc/init.d/show-ip "$ROOTFS/etc/runlevels/default/show-ip"
 
-    # --- SETUP MIRRORS SERVICE (FIXED TIMING) ---
+    # --- SETUP MIRRORS SERVICE (Run Once on Success) ---
     cat <<'MIRROR_SERVICE' > "$ROOTFS/etc/init.d/setup-mirrors"
 #!/sbin/openrc-run
 description="Finds and configures the fastest APK repositories."
 depend() {{
-    # We still want to run after show-ip to ensure basic net config is attempted
     after show-ip
 }}
 start() {{
+    ebegin "Checking for active network connection"
+
+    # 1. Fast Fail: Check if any interface has a global IP.
+    if ! ip -o addr show scope global | grep -q "inet"; then
+        ewarn "No global IP address detected. Will retry next boot."
+        eend 0
+        return 0
+    fi
+
     ebegin "Checking internet connectivity..."
     
-    # Wait loop: Try pinging Alpine repo server for up to 30 seconds
+    # 2. Wait loop: Try pinging Google DNS (8.8.8.8)
     count=0
-    while [ $count -lt 30 ]; do
-        if ping -c 1 -W 2 dl-cdn.alpinelinux.org >/dev/null 2>&1; then
-            echo "Internet is ONLINE."
+    while [ $count -lt 15 ]; do
+        if ping -c 1 -W 1 8.8.8.8 >/dev/null 2>&1; then
             break
         fi
         sleep 1
         count=$((count+1))
     done
     
-    if [ $count -ge 30 ]; then
-        ewarn "Internet unreachable after 30s. Repository setup may fail."
+    # 3. If ping failed, exit gracefully so we try again next boot
+    if [ $count -ge 15 ]; then
+        ewarn "Internet unreachable. Will retry next boot."
+        eend 0
+        return 0
     fi
 
-    ebegin "Setting up fastest APK repositories"
+    ebegin "Internet ONLINE. Setting up fastest APK repositories..."
     
-    # Check both potential locations for the binary
+    # 4. Run setup-apkrepos
     CMD="setup-apkrepos"
     if [ -x /sbin/setup-apkrepos ]; then CMD="/sbin/setup-apkrepos"; fi
     if [ -x /usr/sbin/setup-apkrepos ]; then CMD="/usr/sbin/setup-apkrepos"; fi
 
-    $CMD -1 -c > /dev/tty1 2>&1
-    eend $?
+    # 5. Execute command and check success
+    if $CMD -1 -c > /dev/tty1 2>&1; then
+        einfo "Mirrors configured successfully."
+        # SUCCESS: Disable this service so it does not run again
+        rc-update del setup-mirrors default
+        eend 0
+    else
+        eerror "Failed to setup mirrors. Will retry next boot."
+        eend 1
+    fi
 }}
 MIRROR_SERVICE
     chmod +x "$ROOTFS/etc/init.d/setup-mirrors"
@@ -308,7 +324,6 @@ def main():
     print(f">>> Starting Alpine Builder for {ARCH} on {platform.system()}...")
 
     # 2. Construct Docker Command
-    # We map the specific input files to standard locations inside /input/
     docker_cmd = [
         "docker", "run", "-i", "--rm",
         "-v", f"{current_dir}:/output",
