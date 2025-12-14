@@ -1,4 +1,4 @@
-<img width="500" height="333" alt="Copilot_20251214_224451_tiny" src="https://github.com/user-attachments/assets/a2c291eb-6fd9-4fbe-9362-cf6b2ceb88d2" />
+<img width="500" height="213" alt="untitled" src="https://github.com/user-attachments/assets/31859e15-d802-4170-b05e-72905c0aee69" />
 
 # Custom Alpine Linux Image Builder for Raspberry
 Pi
