@@ -1,7 +1,6 @@
 <img width="500" height="213" alt="untitled" src="https://github.com/user-attachments/assets/31859e15-d802-4170-b05e-72905c0aee69" />
 
-# Custom Alpine Linux Image Builder for Raspberry
-Pi
+# Custom Alpine Linux Image Builder for Raspberry Pi
 A lightweight, cross-platform Python wrapper that uses Docker to build a custom, pre-configured **Alpine Linux (armhf)** disk image for Raspberry Pi.
 
 This builder creates a minimal (512MB) image with essential drivers, Wi-Fi support, SSH (Dropbear), and auto-configuration scripts pre-installed.
